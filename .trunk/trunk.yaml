@@ -1,0 +1,5 @@
+version: 0.1
+
+merge:
+  required_statuses:
+    - PR author is assigned
