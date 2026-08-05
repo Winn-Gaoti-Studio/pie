@@ -1,0 +1,42 @@
+name: PR metadata policy
+
+# Run the trusted policy from the default branch without checking out or executing pull request code.
+on:
+  pull_request_target:
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - assigned
+      - unassigned
+      - ready_for_review
+
+permissions:
+  contents: read
+  pull-requests: read
+
+concurrency:
+  group: pr-metadata-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  require-author-assignee:
+    name: PR author is assigned
+    runs-on: ubuntu-latest
+    steps:
+      - name: Verify pull request author is assigned
+        env:
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+          PR_ASSIGNEES: ${{ toJSON(github.event.pull_request.assignees) }}
+        run: |
+          node -e '
+            const author = process.env.PR_AUTHOR;
+            const assignees = JSON.parse(process.env.PR_ASSIGNEES);
+
+            if (!assignees.some(({ login }) => login === author)) {
+              console.error(`::error title=Missing required assignee::PR author @${author} must be assigned to this pull request.`);
+              process.exit(1);
+            }
+
+            console.log(`PR author @${author} is assigned.`);
+          '
