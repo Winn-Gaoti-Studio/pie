@@ -8,7 +8,7 @@ Pie is an experimental project for building a focused and extensible personal ag
 
 ## Status
 
-Pie now contains the portable Pi configuration, extensions, prompts, and themes that previously lived in the personal dotfiles repository. Its interfaces and installation process may still change as the project grows.
+Pie contains portable Pi configuration, extensions, prompts, and themes. Its interfaces and installation process may still change as the project grows.
 
 ## Goals
 
