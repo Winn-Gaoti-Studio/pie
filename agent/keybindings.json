@@ -1,0 +1,8 @@
+{
+  "app.thinking.cycle": ["shift+tab", "alt+t"],
+  "app.model.select": ["ctrl+l", "alt+p"],
+  "tui.input.newLine": ["shift+enter", "ctrl+j"],
+  "app.clipboard.pasteImage": ["ctrl+v", "alt+v"],
+  "app.session.resume": "alt+r",
+  "app.session.new": "alt+n"
+}

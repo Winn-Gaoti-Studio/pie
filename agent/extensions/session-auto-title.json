@@ -1,0 +1,23 @@
+{
+  "enabled": true,
+  "model": {
+    "provider": "openai",
+    "id": "gpt-5.5",
+    "reasoning": "low"
+  },
+  "auto": {
+    "trigger": "after-first-assistant",
+    "overwriteExisting": false,
+    "confirmOverwrite": true,
+    "startupSummaryMessages": 0
+  },
+  "title": {
+    "maxLength": 80,
+    "maxInputChars": 2000,
+    "maxOutputTokens": 1024,
+    "timeoutMs": 15000,
+    "language": "auto",
+    "titleCase": true,
+    "allowEmoji": false
+  }
+}

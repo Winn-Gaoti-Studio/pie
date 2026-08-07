@@ -19,5 +19,10 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Check changed files for whitespace errors
-        run: git diff --check "$(git merge-base origin/main HEAD)" HEAD
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Validate configuration and extensions
+        run: bash scripts/check.sh

@@ -8,7 +8,7 @@ Pie is an experimental project for building a focused and extensible personal ag
 
 ## Status
 
-Pie is in early development. Its interfaces, project structure, and installation process may change as the first working version takes shape.
+Pie contains portable Pi configuration, extensions, prompts, and themes. Its interfaces and installation process may still change as the project grows.
 
 ## Goals
 
@@ -23,17 +23,49 @@ Pie plans to build on the public packages maintained by [`earendil-works/pi`](ht
 
 Pie is an independent project and is not an official part of the Pi project.
 
+## Repository layout
+
+- `agent/`: configuration installed into `~/.pi/agent`.
+- `agent/extensions/`: Pi extensions and their supporting modules.
+- `agent/prompts/`: reusable prompt templates.
+- `agent/themes/`: Catppuccin themes for the terminal UI.
+- `scripts/tests/`: focused Node.js tests for the extensions.
+
+## Installation
+
+Run the installer from a trusted checkout:
+
+```sh
+bash scripts/install.sh
+```
+
+Set `PI_AGENT_HOME` to install into another destination. The installer copies only the repository-owned configuration and leaves Pi runtime state, credentials, sessions, transcripts, and package caches outside this repository.
+
+## Validation
+
+Run the hermetic checks with Node.js 24 and `jq`:
+
+```sh
+bash scripts/check.sh
+```
+
+When the `pi` executable is installed, run the extension loader smoke test separately:
+
+```sh
+bash scripts/pi-session-auto-title-load.smoke.sh
+```
+
 ## Roadmap
 
 - Define the initial agent experience and configuration model.
 - Build a minimal runnable agent session.
-- Add project-specific tools, skills, and prompts.
+- Expand project-specific tools, skills, and prompts.
 - Introduce automated tests and reproducible development workflows.
 - Document installation, configuration, and extension authoring.
 
 ## Development
 
-Development setup instructions will be added with the initial implementation. Until then, use issues to discuss requirements, design decisions, and proposed contributions.
+Use Pi's public extension APIs and keep runtime-generated state out of version control. Open an issue before substantial changes so the intended scope can be aligned early.
 
 ## Contributing
 
