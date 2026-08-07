@@ -8,7 +8,7 @@ Pie 是一个实验性项目，目标是在 Pi Agent Harness 之上打造一个�
 
 ## 项目状态
 
-Pie 目前处于早期开发阶段。随着首个可运行版本逐步成形，接口、项目结构和安装方式都可能发生变化。
+Pie 现在包含此前存放在个人 dotfiles 仓库中的可移植 Pi 配置、扩展、提示词和主题。随着项目继续发展，接口和安装方式仍可能调整。
 
 ## 目标
 
@@ -23,17 +23,49 @@ Pie 计划使用 [`earendil-works/pi`](https://github.com/earendil-works/pi) 维
 
 Pie 是一个独立项目，并非 Pi 官方项目的一部分。
 
+## 仓库结构
+
+- `agent/`：安装到 `~/.pi/agent` 的配置。
+- `agent/extensions/`：Pi 扩展及其支持模块。
+- `agent/prompts/`：可复用提示词模板。
+- `agent/themes/`：终端界面的 Catppuccin 主题。
+- `scripts/tests/`：针对扩展的 Node.js 测试。
+
+## 安装
+
+在可信任的 checkout 中运行安装脚本：
+
+```sh
+bash scripts/install.sh
+```
+
+可通过 `PI_AGENT_HOME` 安装到其他目录。安装器只复制由仓库管理的配置；Pi 运行时状态、凭据、会话、transcript 和 package cache 均保留在仓库之外。
+
+## 验证
+
+使用 Node.js 24 和 `jq` 运行 hermetic checks：
+
+```sh
+bash scripts/check.sh
+```
+
+本机已安装 `pi` 时，可单独运行扩展加载 smoke test：
+
+```sh
+bash scripts/pi-session-auto-title-load.smoke.sh
+```
+
 ## 路线图
 
 - 定义初始的 Agent 使用体验和配置模型。
 - 构建最小可运行的 Agent Session。
-- 添加项目专属的工具、Skills 和提示词。
+- 扩展项目专属的工具、Skills 和提示词。
 - 引入自动化测试和可复现的开发流程。
 - 完善安装、配置和扩展开发文档。
 
 ## 开发
 
-开发环境说明将随首个实现一同加入。在此之前，可以通过 Issue 讨论需求、设计决策和贡献提案。
+使用 Pi 的公开扩展 API，并确保运行时生成状态不进入版本控制。对于较大的改动，请先创建 Issue，以便尽早对齐目标和范围。
 
 ## 参与贡献
 
