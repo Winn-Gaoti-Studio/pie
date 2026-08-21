@@ -68,7 +68,7 @@ function controlledMonitorFactory() {
 	};
 }
 
-function createFooterHarness() {
+function createFooterHarness(model: Record<string, unknown> = { provider: "test", id: "model" }) {
 	const handlers = new Map<string, (...args: never[]) => unknown>();
 	const commands = new Map<string, { handler: (...args: never[]) => Promise<void> }>();
 	const footerCalls: unknown[] = [];
@@ -93,7 +93,7 @@ function createFooterHarness() {
 			},
 			notify: () => {},
 		},
-		model: { provider: "test", id: "model" },
+		model,
 	};
 	const pi = {
 		on: (event: string, handler: (...args: never[]) => unknown) => handlers.set(event, handler),
@@ -133,7 +133,7 @@ async function loadStarshipExtension() {
 		"export const truncateToWidth = (value, width) => value.slice(0, width);",
 	].join("\n"));
 	writeFileSync(join(stubs, "pi-coding-agent.mjs"), "export {};\n");
-	writeFileSync(join(stubs, "pi-ai.mjs"), "export const getSupportedThinkingLevels = () => ['off'];\n");
+	writeFileSync(join(stubs, "pi-ai.mjs"), "export const getSupportedThinkingLevels = (model) => model?.supportedThinkingLevels ?? ['off'];\n");
 	writeFileSync(join(stubs, "probe.mjs"), "export const loaded = true;\n");
 	const stubUrls = new Map([
 		["@earendil-works/pi-tui", pathToFileURL(join(stubs, "pi-tui.mjs")).href],
@@ -229,6 +229,36 @@ test("the real footer renders before a probe resolves and owns toggle disposal",
 	await assert.rejects(import(probeSpecifier), (error: unknown) => {
 		return error instanceof Error && !error.message.includes(stubs);
 	});
+});
+
+test("footer omits unavailable thinking efforts without empty separators", async () => {
+	const { extension, cleanup } = await loadStarshipExtension();
+	try {
+		const harness = createFooterHarness({
+			provider: "test",
+			id: "model",
+			reasoning: true,
+			thinkingLevelMap: {
+				off: "none",
+				low: "low",
+				medium: null,
+				high: "high",
+				xhigh: null,
+				max: "max",
+			},
+			supportedThinkingLevels: ["off", "low", "medium", "high", "xhigh", "max"],
+		});
+		extension(harness.pi, { createGitStatusMonitor: controlledMonitorFactory().create });
+		await harness.handlers.get("session_start")?.(undefined as never, harness.ctx as never);
+
+		const footer = harness.footer();
+		assert.ok(footer);
+		const rendered = footer.render(120).join("\n");
+		assert.match(rendered, /effort:off=none \[off=none\/low\/high\/max\]/);
+		assert.doesNotMatch(rendered, /\/{2,}|\/\]/);
+	} finally {
+		cleanup();
+	}
 });
 
 test("the production probe configures the 500 ms command and cancels its child", async () => {

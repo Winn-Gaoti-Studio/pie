@@ -90,6 +90,43 @@ test("aborts and returns null when the completion exceeds timeoutMs", async () =
 	assert.deepEqual(events, ["start", "stop"]);
 });
 
+test("stops loading when completion ignores abort after timeout", async () => {
+	let loadingStopped = false;
+	const notices: Array<[string, string]> = [];
+	const provider = createTitleProvider({
+		notify: (_context, message, level) => notices.push([message, level]),
+		complete: async () => {
+			await new Promise<never>(() => undefined);
+			return { stopReason: "stop", content: [] };
+		},
+	});
+	const context = {
+		modelRegistry: {
+			find: () => ({ provider: "openai", id: "gpt-5.5" }),
+			getApiKeyAndHeaders: async () => ({ ok: true as const, apiKey: "fake-key" }),
+		},
+	};
+	const config = {
+		...DEFAULT_CONFIG,
+		title: { ...DEFAULT_CONFIG.title, timeoutMs: 10 },
+	};
+
+	assert.equal(
+		await provider.generate({
+			context,
+			config,
+			sourceLabel: "Session history",
+			sourceText: "User: task",
+			startLoading: () => () => {
+				loadingStopped = true;
+			},
+		}),
+		null,
+	);
+	assert.equal(loadingStopped, true);
+	assert.deepEqual(notices, [["Auto-title timed out after 10ms", "warning"]]);
+});
+
 test("fails before loading when auth is unavailable", async () => {
 	let loadingStarted = false;
 	let completionCalls = 0;

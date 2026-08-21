@@ -72,6 +72,7 @@ const THINKING_LABELS: Record<ModelThinkingLevel, string> = {
 	medium: "med",
 	high: "high",
 	xhigh: "xhigh",
+	max: "max",
 };
 
 function fmtThinkingLevel(level: ModelThinkingLevel): string {
@@ -81,13 +82,12 @@ function fmtThinkingLevel(level: ModelThinkingLevel): string {
 function fmtThinkingEffort(
 	model: ExtensionContext["model"],
 	level: ModelThinkingLevel
-): string {
+): string | undefined {
 	const mapped = model?.thinkingLevelMap?.[level];
 	const label = fmtThinkingLevel(level);
 
-	if (mapped === undefined || mapped === null || mapped === level) {
-		return label;
-	}
+	if (mapped === null) return undefined;
+	if (mapped === undefined || mapped === level) return label;
 
 	return `${label}=${mapped}`;
 }
@@ -98,11 +98,12 @@ function fmtThinkingStatus(
 	showList = true
 ): string {
 	const levels = model ? getSupportedThinkingLevels(model) : [level];
-	const effort = fmtThinkingEffort(model, level);
+	const effort = fmtThinkingEffort(model, level) ?? fmtThinkingLevel(level);
 	if (!showList || levels.length <= 1) return `effort:${effort}`;
 
 	const list = levels
 		.map((option) => fmtThinkingEffort(model, option))
+		.filter((option): option is string => option !== undefined)
 		.join("/");
 	return `effort:${effort} [${list}]`;
 }
