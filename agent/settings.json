@@ -17,7 +17,8 @@
     "extensions/session-auto-title.ts"
   ],
   "packages": [
-    "npm:@superwhisper/pi"
+    "npm:@superwhisper/pi",
+    "npm:pi-tern"
   ],
   "enableInstallTelemetry": false,
   "hideThinkingBlock": true,
